@@ -9,6 +9,7 @@ namespace AlertREport.Db.Models
 {
     public class User
     {
+        public User() { }
         public User(string login, string password, string email, string phoneNumber)
         {
             Login = login;

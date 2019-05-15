@@ -1,5 +1,6 @@
 ﻿using AlertReport.Db.Interfaces;
 using AlertReport.Web.Infrastructure;
+using AlertREport.Db.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace AlertReport.Web.Interfaces
 {
     public interface IApplicationAccountManager
     {
-        Task<LoginStatus> LoginAsync(string login, string password, bool rememberMe);
+        AccountManageResult Login(string login, string password, bool rememberMe = false);
+        Task<AccountManageResult> RegisterAsync(User user);
     }
 }

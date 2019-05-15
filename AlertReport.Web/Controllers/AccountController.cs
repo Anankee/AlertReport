@@ -33,25 +33,17 @@ namespace AlertReport.Web.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public ActionResult Login(LoginViewModel model, string returnUrl)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = await applicationAccountManager.LoginAsync(model.LoginOrEmail, model.Password, model.RememberMe);
+            var result = applicationAccountManager.Login(model.LoginOrEmail, model.Password, model.RememberMe);
+            if (result.IsSuccess)
+                return RedirectToAction("Index", "Home");
 
-            switch (result)
-            {
-                case LoginStatus.SUCCESS:
-                    return View();                  //todo
-                case LoginStatus.WRONG_LOGIN:
-                    return View();                  //todo
-                case LoginStatus.WRONG_PASSWORD:
-                    return View();                  //todo
-                case LoginStatus.ERROR:
-                default:
-                    return View(model);             //todo
-            }
+            AddErrors(result.Errors.ToArray());
+            return View(model);
         }
 
         [HttpGet]
@@ -61,13 +53,30 @@ namespace AlertReport.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Register(RegisterViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
             
-            //unitOfWork.UserRepository.Add(new User(model.Login, model.Password, model.Email, model.PhoneNumber));
+            var result = await applicationAccountManager.RegisterAsync(new User(model.Login, model.Password, model.Email, model.PhoneNumber));
+            if (result.IsSuccess)
+            {
+                applicationAccountManager.Login(model.Login, model.Password);
+                return RedirectToAction("Index", "Home");
+            }
+            AddErrors(result.Errors.ToArray());
             return View();
         }
+
+        #region Helpers
+        private void AddErrors(params string[] error)
+        {
+            foreach (var e in error)
+            {
+                ModelState.AddModelError("", e);
+            }
+        }
+        #endregion
     }
 }

@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertReport.Web", "AlertReport.Web\AlertReport.Web.csproj", "{76EBE135-7252-4F09-A0D3-AFA0E816A6C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertREport.Core", "AlertREport.Core\AlertREport.Core.csproj", "{397D62F5-FFC2-41C7-8F10-C1CFACBAAE93}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertReport.Core", "AlertREport.Core\AlertReport.Core.csproj", "{397D62F5-FFC2-41C7-8F10-C1CFACBAAE93}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertReport.Db", "AlertReport.Db\AlertReport.Db.csproj", "{51B43DE0-1EA9-4E06-88FC-12BE823836AC}"
 EndProject
