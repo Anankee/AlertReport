@@ -1,0 +1,25 @@
+﻿html {
+    height: 100%;
+
+    body {
+        height: 100%;
+
+        #login-container {
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .card-title {
+                position: relative;
+
+                small {
+                    position: absolute;
+                    bottom: -1rem;
+                    right: 5rem;
+                    color: red;
+                }
+            }
+        }
+    }
+}

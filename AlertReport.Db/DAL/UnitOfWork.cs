@@ -17,5 +17,11 @@ namespace AlertReport.Db.DAL
         {
             UserRepository = userRepository;
         }
+
+        public void Dispose()
+        {
+            if (UserRepository != null)
+                UserRepository.Dispose();
+        }
     }
 }

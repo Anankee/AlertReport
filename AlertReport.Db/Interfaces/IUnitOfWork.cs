@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AlertReport.Db.Interfaces
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
         IAlertReportRepository<User> UserRepository { get; set; }
     }

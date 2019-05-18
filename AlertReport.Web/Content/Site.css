@@ -1,18 +1,16 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
-
-/* Set padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
-}
-
+﻿html {
+  height: 100%; }
+  html body {
+    height: 100%; }
+    html body #login-container {
+      height: 90%;
+      display: flex;
+      justify-content: center;
+      align-items: center; }
+      html body #login-container .card-title {
+        position: relative; }
+        html body #login-container .card-title small {
+          position: absolute;
+          bottom: -1rem;
+          right: 5rem;
+          color: red; }

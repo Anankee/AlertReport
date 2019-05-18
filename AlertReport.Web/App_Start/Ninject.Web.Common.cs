@@ -67,7 +67,8 @@ namespace AlertReport.Web.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<IAlertReportRepository<User>>().To<AlertReportRepository<User>>();
-            kernel.Bind<IApplicationAccountManager>().To<ApplicationAccountManager>();
+            kernel.Bind<IAccountManager>().To<AccountManager>();
+            kernel.Bind<IUserManager>().To<UserManager>();
             kernel.Bind<IPasswordHasher>().To<PasswordHasher>();
             kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
         }        

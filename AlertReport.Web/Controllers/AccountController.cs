@@ -9,16 +9,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Security;
 
 namespace AlertReport.Web.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IApplicationAccountManager applicationAccountManager;
+        private IAccountManager accountManager;
+        private IUserManager userManager;
         
-        public AccountController(IApplicationAccountManager applicationAccountManager)
+        public AccountController(IAccountManager accountManager, IUserManager userManager)
         {
-            this.applicationAccountManager = applicationAccountManager;
+            this.accountManager = accountManager;
+            this.userManager = userManager;
         }
 
 
@@ -38,35 +41,103 @@ namespace AlertReport.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = applicationAccountManager.Login(model.LoginOrEmail, model.Password, model.RememberMe);
-            if (result.IsSuccess)
-                return RedirectToAction("Index", "Home");
+            var result = accountManager.Login(model.LoginOrEmail, model.Password, model.RememberMe);
+            if (!result.IsSuccess)
+            {
+                AddErrors(result.Error);
+                return View(model);
+            }
 
-            AddErrors(result.Errors.ToArray());
-            return View(model);
+            if (model.RememberMe)
+                Response.Cookies.Add(CookieHelper.CreateRememberCookie(model.LoginOrEmail));
+
+            if (Url.IsLocalUrl(returnUrl))            
+                return Redirect(returnUrl);            
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public ActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
             
-            var result = await applicationAccountManager.RegisterAsync(new User(model.Login, model.Password, model.Email, model.PhoneNumber));
+            var result = await userManager.RegisterAsync(new User(model.Login, model.Password, model.Email, model.PhoneNumber));
             if (result.IsSuccess)
             {
-                applicationAccountManager.Login(model.Login, model.Password);
+                accountManager.Login(model.Login, model.Password);
                 return RedirectToAction("Index", "Home");
             }
-            AddErrors(result.Errors.ToArray());
+            AddErrors(result.Error);
             return View();
+        }
+
+        [HttpGet]
+        [AlertAuthorization]
+        public ActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AlertAuthorization]
+        public ActionResult ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var result = userManager.ChangePassword(model.UserId, model.OldPassword, model.NewPassword);
+
+            if (result.IsSuccess)            
+                return RedirectToAction("ChangePasswordConfirmation");
+
+            AddErrors(result.Error);
+            return View();
+        }
+
+        [HttpGet]
+        [AlertAuthorization]
+        public ActionResult ChangePasswordConfirmation()
+        {
+            accountManager.LogOut();
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult LogOff()
+        {
+            accountManager.LogOut();
+            return RedirectToAction("Login");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (accountManager != null)
+                {
+                    accountManager.Dispose();
+                    accountManager = null;
+                }
+                if(userManager != null)
+                {
+                    userManager.Dispose();
+                    userManager = null;
+                }
+            }
+
+            base.Dispose(disposing);
         }
 
         #region Helpers

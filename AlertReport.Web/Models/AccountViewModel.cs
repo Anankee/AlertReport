@@ -46,4 +46,25 @@ namespace AlertReport.Web.Models
         public string PhoneNumber { get; set; }
     }
 
+    public class ChangePasswordViewModel
+    {
+        public int UserId { get; set; }
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Old password")]
+        public string OldPassword { get; set; }
+
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "New password")]
+        public string NewPassword { get; set; }
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm new password")]
+        [Compare("NewPassword", ErrorMessage = "New password and confirm new password are not the same.")]
+        public string ConfirmNewPassword { get; set; }
+    }
+
 }

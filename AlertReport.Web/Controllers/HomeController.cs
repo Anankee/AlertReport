@@ -7,6 +7,7 @@ using System.Web.Mvc;
 
 namespace AlertReport.Web.Controllers
 {
+    [AlertAuthorization]
     public class HomeController : Controller
     {
         // GET: Home
