@@ -27,16 +27,20 @@ namespace AlertReport.Web
         {
             IUnitOfWork unitOfWork = DependencyResolver.Current.GetService<IUnitOfWork>();
 
+            var role = unitOfWork.RoleRepository.Get(e => e.Name == "Admin").SingleOrDefault();
             var user = unitOfWork.UserRepository.Get(e => e.Login == "Test").SingleOrDefault();
 
+            if (role == null)            
+                unitOfWork.RoleRepository.Add(new Db.Models.Role() { Name = "Admin" });            
             if (user == null)
             {
                 PasswordHasher passwordHasher = new PasswordHasher();
-                unitOfWork.UserRepository.Add(new AlertREport.Db.Models.User()
+                unitOfWork.UserRepository.Add(new Db.Models.User()
                 {
                     Login = "Test",
                     Password = passwordHasher.HashPassword("123456"),
-                    Email = "test@test.pl"
+                    Email = "test@test.pl",
+                    Roles = new Db.Models.Role[] {unitOfWork.RoleRepository.Get(e=>e.Name == "Admin").SingleOrDefault()}
                 });
             }
                 

@@ -1,4 +1,4 @@
-﻿using AlertREport.Db.Models;
+﻿using AlertReport.Db.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +10,7 @@ namespace AlertReport.Db.Interfaces
     public interface IUnitOfWork : IDisposable
     {
         IAlertReportRepository<User> UserRepository { get; set; }
+        IAlertReportRepository<Role> RoleRepository { get; set; }
+        IAlertReportRepository<Alert> AlertRepository { get; set; }
     }
 }

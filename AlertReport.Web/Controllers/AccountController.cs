@@ -2,7 +2,7 @@
 using AlertReport.Web.Infrastructure;
 using AlertReport.Web.Interfaces;
 using AlertReport.Web.Models;
-using AlertREport.Db.Models;
+using AlertReport.Db.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,6 +82,26 @@ namespace AlertReport.Web.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
+        public JsonResult CheckLoginAvailability(string login)
+        {
+            var user = userManager.GetUserByLogin(login);
+            if (user == null)
+                return Json(new { result = true }, JsonRequestBehavior.AllowGet);
+            return Json(new { result = false, text = string.Format("User with login {0} already exists!", login) }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public JsonResult CheckEmailAvailability(string email)
+        {
+            var user = userManager.GetUserByEmail(email);
+            if (user == null)
+                return Json(new { result = true }, JsonRequestBehavior.AllowGet);
+            return Json(new { result = false, text = string.Format("User with email address {0} already exists!", email) }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
         [AlertAuthorization]
         public ActionResult ChangePassword()
         {
@@ -106,18 +126,17 @@ namespace AlertReport.Web.Controllers
         }
 
         [HttpGet]
-        [AlertAuthorization]
         public ActionResult ChangePasswordConfirmation()
         {
-            accountManager.LogOut();
+            accountManager.LogOut(Response);
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
+        [AlertAuthorization]
         public ActionResult LogOff()
         {
-            accountManager.LogOut();
+            accountManager.LogOut(Response);
             return RedirectToAction("Login");
         }
 

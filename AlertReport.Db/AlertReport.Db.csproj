@@ -51,8 +51,12 @@
     <Compile Include="AlertReportContext.cs" />
     <Compile Include="DAL\AlertReportRepository.cs" />
     <Compile Include="DAL\UnitOfWork.cs" />
+    <Compile Include="Enums\AlertType.cs" />
     <Compile Include="Interfaces\IAlertReportRepository.cs" />
     <Compile Include="Interfaces\IUnitOfWork.cs" />
+    <Compile Include="Models\Alert.cs" />
+    <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -18,8 +18,9 @@ namespace AlertReport.Web.Infrastructure
 
         public override void OnAuthorization(AuthorizationContext filterContext)
         {
-            var user = SessionParser.User ?? userManager.GetUserByLogin(CookieHelper.GetUserLoginFromCookie(filterContext.HttpContext.Request.Cookies));
-
+            var user = SessionParser.User;
+            if (SessionParser.User == null)
+                user = SessionParser.User = userManager.GetUserByLogin(CookieHelper.GetUserLoginFromCookie(filterContext.HttpContext.Request.Cookies));
 
             if (user == null)
             {

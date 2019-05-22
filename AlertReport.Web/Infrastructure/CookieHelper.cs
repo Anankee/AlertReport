@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
-using AlertREport.Db.Models;
+using AlertReport.Db.Models;
 
 namespace AlertReport.Web.Infrastructure
 {
     public class CookieHelper
     {
-        private const string LOGIN_COOKIE = "LOGIN_COOKIE";
+        private const string LOGIN_COOKIE = "Alert me";
 
         internal static HttpCookie CreateRememberCookie(string login)
         {
+            var expiration = DateTime.Now.AddDays(14);
             //create the authentication ticket
             var authTicket = new FormsAuthenticationTicket(
               1,
@@ -25,7 +26,10 @@ namespace AlertReport.Web.Infrastructure
             );
 
             //encrypt the ticket and add it to a cookie
-            return new HttpCookie(LOGIN_COOKIE, FormsAuthentication.Encrypt(authTicket));
+            var cookie =  new HttpCookie(LOGIN_COOKIE, FormsAuthentication.Encrypt(authTicket));
+            cookie.Expires = expiration;
+            cookie.HttpOnly = true;
+            return cookie;
         }
 
         internal static string GetUserLoginFromCookie(HttpCookieCollection cookies)
@@ -40,6 +44,13 @@ namespace AlertReport.Web.Infrastructure
                 return null;
 
             return authTicket.Name;
+        }
+
+        internal static HttpCookie RemoveRememberCookie(HttpCookieCollection cookies)
+        {
+            var cookie = cookies.Get(LOGIN_COOKIE);
+            cookie.Expires = DateTime.Today.AddDays(-1);
+            return cookie;
         }
     }
 }

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using AlertReport.Db.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AlertREport.Db.Models
+namespace AlertReport.Db.Models
 {
     public class User
     {
@@ -24,5 +25,6 @@ namespace AlertREport.Db.Models
         public string Password { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public Role[] Roles { get; set; }
     }
 }

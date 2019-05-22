@@ -9,7 +9,7 @@ namespace AlertReport.Web.App_Start
     using AlertReport.Db.Interfaces;
     using AlertReport.Web.Infrastructure;
     using AlertReport.Web.Interfaces;
-    using AlertREport.Db.Models;
+    using AlertReport.Db.Models;
     using Microsoft.AspNet.Identity;
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
@@ -67,7 +67,10 @@ namespace AlertReport.Web.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Bind<IAlertReportRepository<User>>().To<AlertReportRepository<User>>();
+            kernel.Bind<IAlertReportRepository<Role>>().To<AlertReportRepository<Role>>();
+            kernel.Bind<IAlertReportRepository<Alert>>().To<AlertReportRepository<Alert>>();
             kernel.Bind<IAccountManager>().To<AccountManager>();
+            kernel.Bind<IAlertManager>().To<AlertManager>();
             kernel.Bind<IUserManager>().To<UserManager>();
             kernel.Bind<IPasswordHasher>().To<PasswordHasher>();
             kernel.Bind<IUnitOfWork>().To<UnitOfWork>();

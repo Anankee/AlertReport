@@ -56,7 +56,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input id="registration-btn" type="submit" value="Create" disabled class="btn btn-success" />
             </div>
         </div>
     </div>
@@ -64,8 +64,9 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/RegisterSite.js"></script>
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Back to Login", "Login", "Account")
 </div>

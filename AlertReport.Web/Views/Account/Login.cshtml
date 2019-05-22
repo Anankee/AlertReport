@@ -33,7 +33,7 @@
                         @Html.LabelFor(model => model.RememberMe, htmlAttributes: new { @class = "control-label" })
                         @Html.EditorFor(model => model.RememberMe)
                     </div>
-                    @Html.ActionLink("Register", "Register", "Account", new { @class="btn btn-sm btn-primary", type="button" })
+                    @Html.ActionLink("Register", "Register", "Account", null, new { @class="btn btn-sm btn-primary", type="button" })
                     <button class="btn btn-sm btn-success" type="submit">Login</button>
                 }
             </div>

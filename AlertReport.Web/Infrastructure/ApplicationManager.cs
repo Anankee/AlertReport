@@ -1,7 +1,7 @@
 ﻿using AlertReport.Db.Interfaces;
+using AlertReport.Db.Models;
 using AlertReport.Web.Interfaces;
 using AlertReport.Web.Models;
-using AlertREport.Db.Models;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -32,21 +32,20 @@ namespace AlertReport.Web.Infrastructure
 
                 if (user == null)
                     return new AccountManageResult { IsSuccess = false, Error = "Wrong login/email or password." };
-                
-                SessionParser.User = user;             
+
+                SessionParser.User = user;
                 return new AccountManageResult { IsSuccess = true };
             }
             catch (Exception e)
             {
-                return new AccountManageResult { IsSuccess = false, Error =  e.Message  };
+                return new AccountManageResult { IsSuccess = false, Error = e.Message };
             }
-        }               
-       
-        public void LogOut()
+        }
+
+        public void LogOut(HttpResponseBase response)
         {
             SessionParser.User = null;
-            //ToDo
-            //Destroy cookies
+            response.Cookies.Add(CookieHelper.RemoveRememberCookie(response.Cookies));
         }
 
         public void Dispose()
@@ -96,9 +95,9 @@ namespace AlertReport.Web.Infrastructure
                         return new AccountManageResult { IsSuccess = false, Error = "User already exists with this login" };
 
                     //Check if user with this email address exists
-                    if (unitOfWork.UserRepository.Get(e => e.Email== user.Email) != null)
+                    if (unitOfWork.UserRepository.Get(e => e.Email == user.Email) != null)
                         return new AccountManageResult { IsSuccess = false, Error = "User already exists with this email address" };
-                                        
+
                     //Hash password using Microsoft.AspNet.Identity function 
                     user.Password = passwordHasher.HashPassword(user.Password);
                     unitOfWork.UserRepository.Add(user);
@@ -106,7 +105,7 @@ namespace AlertReport.Web.Infrastructure
                 }
                 catch (Exception e)
                 {
-                    return new AccountManageResult { IsSuccess = false, Error =  e.Message };
+                    return new AccountManageResult { IsSuccess = false, Error = e.Message };
                 }
             });
         }
@@ -121,20 +120,25 @@ namespace AlertReport.Web.Infrastructure
 
                 var result = passwordHasher.VerifyHashedPassword(user.Password, oldPassword);
                 if (result == PasswordVerificationResult.Failed)
-                    return new AccountManageResult { IsSuccess = false, Error =  "Wrong old password." };
+                    return new AccountManageResult { IsSuccess = false, Error = "Wrong old password." };
 
                 user.Password = passwordHasher.HashPassword(newPassword);
                 return new AccountManageResult { IsSuccess = true };
             }
             catch (Exception e)
             {
-                return new AccountManageResult { IsSuccess = false, Error =  e.Message };
+                return new AccountManageResult { IsSuccess = false, Error = e.Message };
             }
         }
 
         public User GetUserByLogin(string login)
         {
-            return unitOfWork.UserRepository.Get(e => e.Login == login).SingleOrDefault();           
+            return unitOfWork.UserRepository.Get(e => e.Login.Equals(login, StringComparison.CurrentCultureIgnoreCase)).SingleOrDefault();
+        }
+
+        public User GetUserByEmail(string email)
+        {
+            return unitOfWork.UserRepository.Get(e => e.Email.Equals(email, StringComparison.CurrentCultureIgnoreCase)).SingleOrDefault();
         }
 
         public void Dispose()
@@ -144,7 +148,37 @@ namespace AlertReport.Web.Infrastructure
                 unitOfWork.Dispose();
                 unitOfWork = null;
             }
-        }        
+        }
+    }
+
+    public class AlertManager : IAlertManager
+    {
+        private IUnitOfWork unitOfWork;
+
+        public AlertManager(IUnitOfWork unitOfWork)
+        {
+            this.unitOfWork = unitOfWork;
+        }
+
+        public void Add(FormAlertViewModel model)
+        {
+            User user = SessionParser.User;
+            Alert alert = new Alert
+            {
+                AlertType = model.AlertType,
+                CreatorLogin = user.Login,
+                DateRow = DateTime.Now,
+                Message = model.Message,
+                Title = model.Title
+            };
+
+            unitOfWork.AlertRepository.Add(alert);
+        }
+    }
+
+    public class RoleManager: IRoleManager
+    {
+
     }
 
     public class AccountManageResult

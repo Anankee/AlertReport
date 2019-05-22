@@ -1,5 +1,5 @@
 ﻿using AlertReport.Web.Infrastructure;
-using AlertREport.Db.Models;
+using AlertReport.Db.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +12,7 @@ namespace AlertReport.Web.Interfaces
     {
         Task<AccountManageResult> RegisterAsync(User user);
         AccountManageResult ChangePassword(int userId, string oldPassword, string newPassword);
-        User GetUserByLogin(string v);
+        User GetUserByLogin(string login);
+        User GetUserByEmail(string email);
     }
 }
