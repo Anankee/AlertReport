@@ -18,6 +18,15 @@
       margin-bottom: 2rem; }
     html body #form-alet-card #AlertType {
       max-width: 12rem; }
+    html body .alert-comment {
+      margin-bottom: 0;
+      padding: 8px 10px;
+      font-size: 0.8em;
+      border-radius: 1rem; }
+    html body .comment-footer {
+      margin-bottom: 20px; }
+    html body .alert-type {
+      max-width: 150px; }
 
 .loader {
   border: 16px solid #f3f3f3;

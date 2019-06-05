@@ -1,0 +1,42 @@
+﻿@model AlertReport.Web.Models.AlertViewModel
+@using AlertReport.Core.Extensions;
+@using AlertReport.Web.Infrastructure
+@foreach (var alert in Model.Alerts)
+{
+    <div class="card border-info" style="margin-bottom: 10px;">
+        <div class="card-header card-header-@alert.Id text-white @Model.AlertColor(alert)">
+            <div>
+                <span class="alert-title" style="cursor: pointer" data-toggle="collapse" data-target="#accortion-@alert.Id" aria-expanded="true" aria-controls="accortion-@alert.Id">
+                    <strong>@alert.User.FirstName @alert.User.LastName:</strong> @alert.Title
+                    <i class="far fa-arrow-alt-circle-down"></i>
+                </span>
+                @if (Model.IsModerator)
+                {                   
+                    @Html.DropDownList("AlertType", Model.GetAlertTypeSelectList(alert.AlertType), new { @class = "float-right custom-select alert-type", onchange = "UpdateAlertType('" + alert.Id + "', this)" })
+                }
+                else
+                {
+                    <span class="float-right">@alert.AlertType.GetDisplayName()</span>
+                }
+            </div>
+            <small class="added-time">
+                <i class="fab fa-pinterest-p"></i>
+                @Html.AlertTime(alert.DateRow)<text>.</text>                
+            </small>
+        </div>
+        <div id="accortion-@alert.Id" class="collapse">
+            <div class="card-body">
+                <span>
+                    @Html.Raw(Html.Encode(alert.Message).Replace("\r\n", "<br />").Replace("\n", "<br />").Replace("\r", "<br />"))
+                </span>
+            </div>
+            <div class="card-footer">
+                <div>
+                    <div id="alert-@alert.Id" class="text-right">
+                        @Html.Action("AlertComments", "Comment", new { alertId = alert.Id })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

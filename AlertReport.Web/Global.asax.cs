@@ -1,5 +1,6 @@
 using AlertReport.Db.DAL;
 using AlertReport.Db.Interfaces;
+using AlertReport.Db.Models;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
@@ -31,17 +32,30 @@ namespace AlertReport.Web
             var user = unitOfWork.UserRepository.Get(e => e.Login == "Test").SingleOrDefault();
 
             if (role == null)            
-                unitOfWork.RoleRepository.Add(new Db.Models.Role() { Name = "Admin" });            
+                unitOfWork.RoleRepository.Add(new Role() { Name = "Admin" });            
             if (user == null)
             {
                 PasswordHasher passwordHasher = new PasswordHasher();
-                unitOfWork.UserRepository.Add(new Db.Models.User()
+                unitOfWork.UserRepository.Add(new User()
                 {
                     Login = "Test",
+                    FirstName = "Krystian",
+                    LastName = "Cuper",
                     Password = passwordHasher.HashPassword("123456"),
-                    Email = "test@test.pl",
-                    Roles = new Db.Models.Role[] {unitOfWork.RoleRepository.Get(e=>e.Name == "Admin").SingleOrDefault()}
+                    Email = "test@test.pl"                   
                 });
+
+                var dbUser = unitOfWork.UserRepository.Get(e => e.Login == "Test").SingleOrDefault();
+
+                dbUser.UserRoles = new List<UserRole>() {
+                    new UserRole
+                    {
+                        Role = unitOfWork.RoleRepository.Get(e=>e.Name == "Admin").SingleOrDefault(),
+                        User = dbUser
+                    }   
+                };
+
+                unitOfWork.UserRepository.Update(dbUser);
             }
                 
                 unitOfWork.Dispose();

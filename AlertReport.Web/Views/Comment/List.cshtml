@@ -1,0 +1,55 @@
+﻿@model AlertReport.Web.Models.CommentViewModel
+@using AlertReport.Web.Infrastructure
+@using AlertReport.Web.Models
+<div>
+    <button class="btn btn-sm btn-outline-primary" data-toggle="collapse" data-target="#message-collapse-@Model.ParentId" style="margin-bottom: 10px;">
+        Add new comment
+        <i class="far fa-comment-dots"></i>
+    </button>
+    @using (Html.BeginForm("Add", "Comment", FormMethod.Post, new { @class = "add-alert-comment-form" }))
+    {
+        <input id="ParentId" name="ParentId" value="@Model.ParentId" hidden />
+        <input id="ParentType" name="ParentType" value="@Model.ParentType" hidden />
+        <div class="collapse" id="message-collapse-@Model.ParentId">
+            <textarea id="Message" name="Message" class="form-control form-control-sm comments-alert-@Model.ParentId" rows="1" style="overflow: hidden; margin: 5px 0 5px 0;" placeholder="Write comment..."></textarea>
+            <button type="submit" class="btn btn-sm btn-outline-primary" style="margin-bottom: 10px;">Save</button>
+        </div>
+    }
+</div>
+
+
+@foreach (var comment in Model.Comments)
+{
+    <div class="row">
+        <span class="far fa-comment col-1" style="font-size: 2em;"></span>
+        <div class="alert alert-dark alert-comment col-11" role="alert">
+            <strong>@comment.User.FirstName @comment.User.LastName</strong> @(comment?.Message)
+        </div>
+    </div>
+    <div class="comment-footer row">
+        <div class="col-11 offset-1 text-left">
+            <small>
+                <a data-toggle="collapse" data-target="#anwer-collapse-@comment.Id" href="#">
+                    reply
+                </a>
+            </small>
+            <small>
+                @Html.CommentTime(comment.RowDate)
+            </small>
+            <div id="answer-comments-@comment.Id">
+                @Html.Partial("SubComment", comment.Comments ?? new List<AlertReport.Db.Models.Comment>())
+            </div>
+        </div>
+        <div class="col-11 offset-1" style="padding-right: 0;">
+            @using (Html.BeginForm("Add", "Comment", FormMethod.Post, new { @class = "add-comment-comment-form" }))
+            {
+                <input id="ParentId" name="ParentId" value="@comment.Id" hidden />
+                <input id="ParentType" name="ParentType" value="@CommentParentType.COMMENT" hidden />
+                <div class="collapse" id="anwer-collapse-@comment.Id">
+                    <textarea id="Message" name="Message" class="form-control form-control-sm anwer-alert-@comment.Id" rows="1" style="overflow: hidden" placeholder="Write comment..."></textarea>
+                    <button type="submit" class="btn btn-sm btn-outline-primary float-right">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+}

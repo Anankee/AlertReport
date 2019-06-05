@@ -1,10 +1,12 @@
-﻿using AlertReport.Db.Interfaces;
+﻿using AlertReport.Db.Enums;
+using AlertReport.Db.Interfaces;
 using AlertReport.Db.Models;
 using AlertReport.Web.Interfaces;
 using AlertReport.Web.Models;
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -12,14 +14,31 @@ using System.Web.Security;
 
 namespace AlertReport.Web.Infrastructure
 {
-    public class AccountManager : IAccountManager
+    public abstract class BaseManager : IDisposable
     {
-        private IUnitOfWork unitOfWork;
-        private readonly IPasswordHasher passwordHasher;
+        protected IUnitOfWork unitOfWork;
 
-        public AccountManager(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
+        public BaseManager(IUnitOfWork unitOfWork)
         {
             this.unitOfWork = unitOfWork;
+        }
+
+        public void Dispose()
+        {
+            if (unitOfWork != null)
+            {
+                unitOfWork.Dispose();
+                unitOfWork = null;
+            }
+        }
+    }
+    
+    public class AccountManager : BaseManager, IAccountManager
+    {
+        private readonly IPasswordHasher passwordHasher;
+
+        public AccountManager(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher) : base(unitOfWork)
+        {
             this.passwordHasher = passwordHasher;
         }
 
@@ -47,20 +66,14 @@ namespace AlertReport.Web.Infrastructure
             SessionParser.User = null;
             response.Cookies.Add(CookieHelper.RemoveRememberCookie(response.Cookies));
         }
-
-        public void Dispose()
-        {
-            if (unitOfWork != null)
-            {
-                unitOfWork.Dispose();
-                unitOfWork = null;
-            }
-        }
-
+        
         private User GetUserFromDb(string loginOrEmail, string password)
         {
             //First find user by login or email address
-            var user = unitOfWork.UserRepository.Get(e => e.Login == loginOrEmail || e.Email == loginOrEmail).SingleOrDefault();
+            var user = unitOfWork.UserRepository.Get(e => e.Login == loginOrEmail || e.Email == loginOrEmail)
+                .Include(e=>e.UserRoles.Select(s=>s.Role))
+                .SingleOrDefault();
+
             if (user == null)
                 return null;
 
@@ -73,14 +86,12 @@ namespace AlertReport.Web.Infrastructure
         }
     }
 
-    public class UserManager : IUserManager
+    public class UserManager : BaseManager, IUserManager
     {
-        private IUnitOfWork unitOfWork;
         private IPasswordHasher passwordHasher;
 
-        public UserManager(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
+        public UserManager(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher) : base(unitOfWork)
         {
-            this.unitOfWork = unitOfWork;
             this.passwordHasher = passwordHasher;
         }
 
@@ -133,40 +144,32 @@ namespace AlertReport.Web.Infrastructure
 
         public User GetUserByLogin(string login)
         {
-            return unitOfWork.UserRepository.Get(e => e.Login.Equals(login, StringComparison.CurrentCultureIgnoreCase)).SingleOrDefault();
+            return unitOfWork.UserRepository.Get(e => e.Login.Equals(login, StringComparison.CurrentCultureIgnoreCase))
+                .Include(e => e.UserRoles.Select(s => s.Role))
+                .SingleOrDefault();
         }
 
         public User GetUserByEmail(string email)
         {
-            return unitOfWork.UserRepository.Get(e => e.Email.Equals(email, StringComparison.CurrentCultureIgnoreCase)).SingleOrDefault();
-        }
-
-        public void Dispose()
-        {
-            if (unitOfWork != null)
-            {
-                unitOfWork.Dispose();
-                unitOfWork = null;
-            }
+            return unitOfWork.UserRepository.Get(e => e.Email.Equals(email, StringComparison.CurrentCultureIgnoreCase))
+                .Include(e => e.UserRoles.Select(s => s.Role))
+                .SingleOrDefault();
         }
     }
 
-    public class AlertManager : IAlertManager
+    public class AlertManager : BaseManager, IAlertManager
     {
-        private IUnitOfWork unitOfWork;
-
-        public AlertManager(IUnitOfWork unitOfWork)
+        public AlertManager(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
-            this.unitOfWork = unitOfWork;
         }
 
         public void Add(FormAlertViewModel model)
         {
-            User user = SessionParser.User;
+            User dbUser = unitOfWork.UserRepository.Get(SessionParser.User.Id);
             Alert alert = new Alert
             {
                 AlertType = model.AlertType,
-                CreatorLogin = user.Login,
+                User = dbUser,
                 DateRow = DateTime.Now,
                 Message = model.Message,
                 Title = model.Title
@@ -174,11 +177,73 @@ namespace AlertReport.Web.Infrastructure
 
             unitOfWork.AlertRepository.Add(alert);
         }
+
+        public IEnumerable<Alert> Get()
+        {
+            return unitOfWork.AlertRepository.GetAll()
+                .Include(e => e.User);
+        }
+
+        public IEnumerable<Alert> Get(AlertType alertType)
+        {
+            return unitOfWork.AlertRepository.Get(e => e.AlertType == alertType)
+                .Include(e=>e.User);
+        }
+
+        public void UpdateType(int id, AlertType alertType)
+        {
+            var dbEntity = unitOfWork.AlertRepository.Get(id);
+            dbEntity.AlertType = alertType;
+            unitOfWork.AlertRepository.Update(dbEntity);
+        }
     }
 
-    public class RoleManager: IRoleManager
+    public class CommentManager : BaseManager, ICommentManager
     {
+        public CommentManager(IUnitOfWork unitOfWork) : base(unitOfWork) { }
 
+        public void Add(FormCommentModel model)
+        {
+            Comment comment = new Comment
+            {
+                User = unitOfWork.UserRepository.Get(SessionParser.User.Id),
+                Message = model.Message,
+                RowDate = DateTime.Now
+            };
+
+            switch (model.ParentType)
+            {
+                case CommentParentType.ALERT:
+                    comment.Alert = unitOfWork.AlertRepository.Get(model.ParentId);
+                    break;
+                case CommentParentType.COMMENT:
+                    comment.ParentComment = unitOfWork.CommentRepository.Get(model.ParentId);
+                    break;
+            }
+
+            unitOfWork.CommentRepository.Add(comment);
+        }
+
+        public IEnumerable<Comment> GetByAlert(int id)
+        {
+            return unitOfWork.CommentRepository.Get(e => e.Alert.Id == id)
+                .Include(e=>e.ParentComment)
+                .Include(e=>e.Comments)
+                .Include(e=>e.User);
+        }
+
+        public IEnumerable<Comment> GetByComment(int id)
+        {
+            return unitOfWork.CommentRepository.Get(e => e.ParentComment.Id == id)
+                .Include(e => e.ParentComment)
+                .Include(e => e.Comments)
+                .Include(e => e.User);
+        }
+    }
+
+    public class RoleManager : BaseManager, IRoleManager
+    {
+        public RoleManager(IUnitOfWork unitOfWork) : base(unitOfWork) { }
     }
 
     public class AccountManageResult

@@ -1,0 +1,31 @@
+﻿@model IEnumerable<AlertReport.Db.Models.Comment>
+@using AlertReport.Web.Infrastructure
+
+@if (Model != null && Model.Count() > 0)
+{
+    var parentId = Model.FirstOrDefault().ParentComment.Id;
+    <div>
+        <small>
+            <a data-toggle="collapse" data-target="#answer-comment-collapse-@parentId" href="#">
+                <i class="fas fa-arrow-right"></i>
+                @Model.Count() answers
+            </a>
+        </small>
+    </div>
+    <div class="collapse" id="answer-comment-collapse-@parentId">
+        @foreach (var answerComment in Model)
+        {
+            <div class="row">
+                <span class="far fa-comments col-1" style="font-size: 2em;"></span>
+                <div class="alert alert-dark alert-comment col-10" role="alert">
+                    <strong>@answerComment.User.FirstName @answerComment.User.LastName</strong> @(answerComment?.Message)
+                </div>
+            </div>
+            <div class="comment-footer col-11 offset-1 text-left">
+                <small>
+                    @Html.CommentTime(answerComment.RowDate)
+                </small>
+            </div>
+        }
+    </div>
+}

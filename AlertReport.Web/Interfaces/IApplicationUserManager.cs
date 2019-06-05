@@ -8,11 +8,12 @@ using System.Web;
 
 namespace AlertReport.Web.Interfaces
 {
-    public interface IUserManager : IDisposable
+    public interface IUserManager
     {
         Task<AccountManageResult> RegisterAsync(User user);
         AccountManageResult ChangePassword(int userId, string oldPassword, string newPassword);
         User GetUserByLogin(string login);
         User GetUserByEmail(string email);
+        void Dispose();
     }
 }

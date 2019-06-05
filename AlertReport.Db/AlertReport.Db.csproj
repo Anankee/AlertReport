@@ -58,6 +58,7 @@
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

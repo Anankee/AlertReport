@@ -244,7 +244,9 @@
     <Compile Include="App_Start\Ninject.Web.Common.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AlertController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\CommentController.cs" />
     <Compile Include="Controllers\FormAlertController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NavbarController.cs" />
@@ -254,12 +256,16 @@
     <Compile Include="Infrastructure\AlertAuthorizationAttribute.cs" />
     <Compile Include="Infrastructure\ApplicationManager.cs" />
     <Compile Include="Infrastructure\CookieHelper.cs" />
+    <Compile Include="Infrastructure\CustomHtmlHelpers.cs" />
     <Compile Include="Infrastructure\SessionParser.cs" />
     <Compile Include="Interfaces\IAlertManager.cs" />
     <Compile Include="Interfaces\IApplicationAccountManager.cs" />
     <Compile Include="Interfaces\IApplicationUserManager.cs" />
+    <Compile Include="Interfaces\ICommentManager.cs" />
     <Compile Include="Interfaces\IRoleManager.cs" />
     <Compile Include="Models\AccountViewModel.cs" />
+    <Compile Include="Models\AlertViewModel.cs" />
+    <Compile Include="Models\CommentViewModel.cs" />
     <Compile Include="Models\FormAlertViewModel.cs" />
     <Compile Include="Models\NavbarViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -277,6 +283,11 @@
     <Content Include="Views\Account\ChangePasswordConfirmation.cshtml" />
     <Content Include="Views\Navbar\Index.cshtml" />
     <Content Include="Views\FormAlert\Index.cshtml" />
+    <Content Include="Views\Alert\Index.cshtml" />
+    <Content Include="Views\Alert\List.cshtml" />
+    <Content Include="Views\Comment\List.cshtml" />
+    <Content Include="Views\Comment\Comment.cshtml" />
+    <Content Include="Views\Comment\SubComment.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

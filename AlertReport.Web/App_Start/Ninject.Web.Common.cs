@@ -69,9 +69,11 @@ namespace AlertReport.Web.App_Start
             kernel.Bind<IAlertReportRepository<User>>().To<AlertReportRepository<User>>();
             kernel.Bind<IAlertReportRepository<Role>>().To<AlertReportRepository<Role>>();
             kernel.Bind<IAlertReportRepository<Alert>>().To<AlertReportRepository<Alert>>();
+            kernel.Bind<IAlertReportRepository<Comment>>().To<AlertReportRepository<Comment>>();
             kernel.Bind<IAccountManager>().To<AccountManager>();
             kernel.Bind<IAlertManager>().To<AlertManager>();
             kernel.Bind<IUserManager>().To<UserManager>();
+            kernel.Bind<ICommentManager>().To<CommentManager>();
             kernel.Bind<IPasswordHasher>().To<PasswordHasher>();
             kernel.Bind<IUnitOfWork>().To<UnitOfWork>();
         }        

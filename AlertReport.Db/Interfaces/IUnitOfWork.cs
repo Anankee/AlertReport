@@ -12,5 +12,6 @@ namespace AlertReport.Db.Interfaces
         IAlertReportRepository<User> UserRepository { get; set; }
         IAlertReportRepository<Role> RoleRepository { get; set; }
         IAlertReportRepository<Alert> AlertRepository { get; set; }
+        IAlertReportRepository<Comment> CommentRepository { get; set; }
     }
 }

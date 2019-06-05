@@ -10,9 +10,10 @@ using System.Web;
 
 namespace AlertReport.Web.Interfaces
 {
-    public interface IAccountManager : IDisposable
+    public interface IAccountManager
     {
         AccountManageResult Login(string login, string password, bool rememberMe = false);
         void LogOut(HttpResponseBase response);
+        void Dispose();
     }
 }

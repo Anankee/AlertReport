@@ -8,5 +8,6 @@ namespace AlertReport.Web.Interfaces
 {
     public interface IRoleManager
     {
+        void Dispose();
     }
 }

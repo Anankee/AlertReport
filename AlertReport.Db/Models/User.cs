@@ -22,9 +22,14 @@ namespace AlertReport.Db.Models
         [Key]
         public int Id { get; set; }
         public string Login { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        public Role[] Roles { get; set; }
+        public bool IsDisabled { get; set; }
+        public ICollection<UserRole> UserRoles { get; set; }
+        public ICollection<Alert> Alerts { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
 }

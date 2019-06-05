@@ -12,11 +12,11 @@ namespace AlertReport.Db.DAL
     public class AlertReportRepository<T> : IAlertReportRepository<T> where T : class
     {
         private DbContext dbContext;
-        private readonly IDbSet<T> dbSet;
-
-        public AlertReportRepository()
+        private IDbSet<T> dbSet;
+        
+        public void SetContextAndDbSet(DbContext dbContext)
         {
-            dbContext= new AlertReportContext(); ;
+            this.dbContext = dbContext;
             dbSet = dbContext.Set<T>();
         }
 
@@ -31,14 +31,14 @@ namespace AlertReport.Db.DAL
             return dbSet.Find(id);
         }
 
-        public IEnumerable<T> Get(Expression<Func<T, bool>> expression)
+        public IQueryable<T> Get(Expression<Func<T, bool>> expression)
         {
             return dbSet.Where(expression);
         }
 
-        public IEnumerable<T> GetAll()
+        public IQueryable<T> GetAll()
         {
-            return dbSet.ToList();
+            return dbSet;
         }
 
         public void Update(T entity)
@@ -53,12 +53,6 @@ namespace AlertReport.Db.DAL
             T dbEntity = dbSet.Find(id);
             dbSet.Remove(dbEntity);
             dbContext.SaveChanges();
-        }
-
-        public void Dispose()
-        {
-            dbContext.Dispose();
-            dbContext = null;
         }
     }
 }

@@ -27,9 +27,24 @@
         }
 
         #form-alet-card {
-            #AlertType{
+            #AlertType {
                 max-width: 12rem;
             }
+        }
+
+        .alert-comment {
+            margin-bottom: 0;
+            padding: 8px 10px;
+            font-size: 0.8em;
+            border-radius: 1rem;
+        }
+
+        .comment-footer {
+            margin-bottom: 20px;
+        }
+
+        .alert-type{
+            max-width: 150px;
         }
     }
 }

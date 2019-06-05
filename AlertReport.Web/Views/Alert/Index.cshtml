@@ -1,0 +1,118 @@
+﻿@model AlertReport.Web.Models.AlertViewModel
+@using AlertReport.Db.Enums
+@{
+    ViewBag.Title = "Index";
+}
+
+<div id="alert-content" class="container">
+    @Html.EnumDropDownListFor(e => e.SelectedAlertType, "All", new { @class = "custom-select" })
+
+    <div id="alert-list">
+        @Html.Partial("List", Model)
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $('#SelectedAlertType').change(function () {
+            var value = $(this).val();
+            if (value !== '') {
+                $.get("/Alert/List", { alertType: value }, function (data) {
+                    $('#alert-list').html(data);
+                })
+            }
+            else {
+                $.get("/Alert/List", function (data) {
+                    $('#alert-list').html(data);
+                })
+            }
+        })
+
+        $('.add-alert-comment-form').submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var data = form.serializeArray();
+            var url = form.attr('action')
+            var method = form.attr('method');
+
+            $.ajax({
+                type: method,
+                url: url,
+                data: data
+            })
+                .done(function (result) {
+                    $('#alert-' + data[0].value).html(result);
+                })
+                .fail(function (result) {
+                    alert("Error");
+                    console.log(result);
+                })
+        });
+
+        $('.add-comment-comment-form').submit(function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var data = form.serializeArray();
+            var url = form.attr('action')
+            var method = form.attr('method');
+            var parentId = data[0].value;
+
+            $.ajax({
+                type: method,
+                url: url,
+                data: data
+            })
+                .done(function (result) {
+                    $('#answer-comments-' + parentId).html(result);
+                })
+                .fail(function (result) {
+                    alert("Error");
+                    console.log(result);
+                })
+                .always(function () {
+                    $('#anwer-collapse-' + parentId).collapse('hide')
+                    $('#answer-comment-collapse-' + parentId).collapse('show')
+                    $('.anwer-alert-' + parentId).text('');
+                })
+        });
+
+        function UpdateAlertType(alertId, sender) {
+            var alertType = $(sender).val();
+
+            $.ajax({
+                type: 'POST',
+                url: '/Alert/UpdateType',
+                data: {
+                    id: alertId,
+                    alertType: alertType
+                }
+            })
+                .done(function () {
+                    var header = $('.card-header-' + alertId);
+                    switch (alertType) {
+                        case '@AlertType.LOW.ToString()':
+                            header.removeClass('bg-danger');
+                            header.removeClass('bg-warning');
+                            header.addClass('bg-info');
+                            break;
+                        case '@AlertType.MAJOR.ToString()':
+                            header.removeClass('bg-info');
+                            header.removeClass('bg-warning');
+                            header.addClass('bg-danger');
+                            break;
+                        case '@AlertType.MINOR.ToString()':
+                            header.removeClass('bg-danger');
+                            header.removeClass('bg-info');
+                            header.addClass('bg-warning');
+                            break;
+                        default:
+                            break;
+                    }
+                })
+                .fail(function (result) {
+                    alert("Error");
+                    console.log(result);
+                });
+        }
+    </script>
+}

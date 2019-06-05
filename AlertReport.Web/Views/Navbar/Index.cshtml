@@ -1,5 +1,6 @@
 ﻿@model AlertReport.Web.Models.NavbarViewModel
 @using AlertReport.Db.Enums;
+@using AlertReport.Web.Infrastructure;
 @using AlertReport.Core.Extensions;
 
 <style>
@@ -20,131 +21,88 @@
         top: -20px !important;
     }
 </style>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
-        <a class="navbar-brand" href="#">
-            Alert Dashboard
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon">
-            </span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <ul class="navbar-nav mr-auto">
-                <li>
-                    <a href="@Url.Action("Index", "AlertForm")" class="nav-link">
-                        <i class="fas fa-chart-line"></i>
-                        Dashboard
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
+    <a class="navbar-brand" href="#">
+        Alert Dashboard
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon">
+        </span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <ul class="navbar-nav mr-auto">
+            <li>
+                <a href="@Url.Action("Index", "AlertForm")" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="@Url.Action("Index", "FormAlert")" class="nav-link">
+                    <i class="fas fa-edit"></i>
+                    Form
+                </a>
+            </li>
+            <li class="nav-item">
+                <div class="dropdown">
+                    <a href="@Url.Action("Index", "Alert")" class="nav-link dropdown-toggle" id="dropdownMenuButton">
+                        <i class="fa fa-table fa-fw"></i>
+                        Zgłoszenia
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a href="@Url.Action("Index", "FormAlert")" class="nav-link">
-                        <i class="fas fa-edit"></i>
-                        Form
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <div class="dropdown">
-                        <a href="@Url.Action("Applications", "Alerts")" class="nav-link dropdown-toggle" id="dropdownApplications">
-                            <i class="fa fa-table fa-fw"></i>
-                            Applications
-                        </a>
-                        <div id="dropdownApplications-menu" class="dropdown-menu">
-                            @foreach (var alertType in Model.AlertTypes)
-                            {
-                                if (alertType != AlertType.COMPLETED)
-                                {
-                                    <a href="@Url.Action("ListByAlertType", "Alerts", new { alertType=alertType })" class="dropdown-item">
-                                        <i class="far fa-arrow-alt-circle-right"></i>
-                                        @alertType.GetDisplayName()
-                                    </a>
-                                }
-                            }
-                        </div>
-                    </div>
-                </li>
-            </ul>
-            <div @*class="form-inline"*@>
-                <ul class="navbar-nav">
-                    <li>
-                        <span class="navbar-text">Welcome @Model.LoggedUser.Login!</span>
-                    </li>
-                    <li>
-                        @if (Model.IsModerator)
+                    <div class="dropdown-menu">
+                        @foreach (var alertType in Model.AlertTypes)
                         {
-                            <div id="notifi--holder" class="dropdown" data-toggle="tooltip" data-placement="left" title="Nowe alerty">
-                                <a id="notifications" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <i class="fas fa-bell"></i>
-                                    @if (Model.UnreadAlerts.Count() > 0)
-                                    {
-                                        <span id="notifications--count" class="badge badge-danger">
-                                            @Model.UnreadAlerts.Count()
-                                        </span>
-                                    }
+                            if (alertType != AlertType.COMPLETED)
+                            {
+                                <a href="@Url.Action("Index", "Alert", new { alertType=alertType })" class="dropdown-item">
+                                    <i class="far fa-arrow-alt-circle-right"></i>
+                                    @alertType.GetDisplayName()
                                 </a>
-                                @if (Model.UnreadAlerts != null && Model.UnreadAlerts.Count() > 0)
-                                {
-                                    <div class="dropdown-menu dropdown-menu-right custom-menu">
-                                        <div class="custom-item"></div>
-                                        @foreach (var alert in Model.UnreadAlerts)
-                                        {
-                                            <a class="dropdown-item custom-item" href="@Url.Action("Detail", "Alerts", new { id = alert.Id } )">
-                                                <small>
-                                                    <span>
-                                                        <strong>
-                                                            @alert.CreatorName
-                                                        </strong>
-                                                        @alert.Title
-                                                    </span>
-                                                    <span>
-                                                        @((alert.Message.Length > 50 ? alert.Message.Substring(0, 50) + "..." : alert.Message))
-                                                    </span>
-                                                    <span style="color: gray">
-                                                        <i class="fas fa-map-pin"></i>
-                                                        @alert.GetAddedTime()<text>.</text>
-                                                    </span>
-                                                </small>
-                                            </a>
-                                        }
-                                    </div>
-                                }
-                            </div>
+                            }
                         }
-                    </li>
-                    <li>
-
-                        <div id="notifi--holder" class="dropdown">
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div @*class="form-inline"*@>
+            <ul class="navbar-nav">
+                <li>
+                    <span class="navbar-text">Welcome @Model.LoggedUser.Login!</span>
+                </li>
+                <li>
+                    @if (Model.IsModerator)
+                    {
+                        <div id="notifi--holder" class="dropdown" data-toggle="tooltip" data-placement="left" title="Nowe alerty">
                             <a id="notifications" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                <div data-toggle="tooltip" data-placement="right" title="Powiadomienia">
-                                    <i class="fas fa-envelope"></i>
-                                    @if (Model.UnreadAlerts.Count() > 0)
-                                    {
-                                        <span id="notifications--count" class="badge badge-danger">
-                                            @Model.UnreadAlerts.Count()
-                                        </span>
-                                    }
-                                </div>
+                                <i class="fas fa-bell"></i>
+                                @if (Model.UnreadAlerts.Count() > 0)
+                                {
+                                    <span id="notifications--count" class="badge badge-danger">
+                                        @Model.UnreadAlerts.Count()
+                                    </span>
+                                }
                             </a>
-
                             @if (Model.UnreadAlerts != null && Model.UnreadAlerts.Count() > 0)
                             {
-                                <div class="dropdown-menu custom-menu">
+                                <div class="dropdown-menu dropdown-menu-right custom-menu">
                                     <div class="custom-item"></div>
-                                    @foreach (var comment in Model.UnreadAlerts)
+                                    @foreach (var alert in Model.UnreadAlerts)
                                     {
-                                        <a class="dropdown-item custom-item" href="@Url.Action("Detail", "Comment", new { id = comment.Id } )">
+                                        <a class="dropdown-item custom-item" href="@Url.Action("Detail", "Alerts", new { id = alert.Id } )">
                                             <small>
                                                 <span>
                                                     <strong>
-                                                        <i class="fas fa-comment"></i>
-                                                        @comment.CreatorName
+                                                        @alert.User.Login
                                                     </strong>
+                                                    @alert.Title
                                                 </span>
                                                 <span>
-                                                    @(comment.Message.Length > 50 ? comment.Message.Substring(0, 50) + "..." : comment.Message)
+                                                    @((alert.Message.Length > 50 ? alert.Message.Substring(0, 50) + "..." : alert.Message))
                                                 </span>
                                                 <span style="color: gray">
                                                     <i class="fas fa-map-pin"></i>
-                                                    @comment.GetAddedTime()
+                                                    @Html.AlertTime(alert.DateRow)<text>.</text>
                                                 </span>
                                             </small>
                                         </a>
@@ -152,14 +110,58 @@
                                 </div>
                             }
                         </div>
-                    </li>
-                    <li>
-                        <a href="@Url.Action("LogOff", "Account")" class="nav-link">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Sign Out
+                    }
+                </li>
+                <li>
+
+                    <div id="notifi--holder" class="dropdown">
+                        <a id="notifications" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            <div data-toggle="tooltip" data-placement="right" title="Powiadomienia">
+                                <i class="fas fa-envelope"></i>
+                                @if (Model.UnreadAlerts.Count() > 0)
+                                {
+                                    <span id="notifications--count" class="badge badge-danger">
+                                        @Model.UnreadAlerts.Count()
+                                    </span>
+                                }
+                            </div>
                         </a>
-                    </li>
-                </ul> 
-            </div>
+
+                        @if (Model.UnreadAlerts != null && Model.UnreadAlerts.Count() > 0)
+                        {
+                            <div class="dropdown-menu custom-menu">
+                                <div class="custom-item"></div>
+                                @foreach (var comment in Model.UnreadAlerts)
+                                {
+                                    <a class="dropdown-item custom-item" href="@Url.Action("Detail", "Comment", new { id = comment.Id } )">
+                                        <small>
+                                            <span>
+                                                <strong>
+                                                    <i class="fas fa-comment"></i>
+                                                    @comment.User.Login
+                                                </strong>
+                                            </span>
+                                            <span>
+                                                @(comment.Message.Length > 50 ? comment.Message.Substring(0, 50) + "..." : comment.Message)
+                                            </span>
+                                            <span style="color: gray">
+                                                <i class="fas fa-map-pin"></i>
+                                                @Html.CommentTime(comment.DateRow)
+                                            </span>
+                                        </small>
+                                    </a>
+                                }
+                            </div>
+                        }
+                    </div>
+                </li>
+                <li>
+                    <a href="@Url.Action("LogOff", "Account")" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sign Out
+                    </a>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>

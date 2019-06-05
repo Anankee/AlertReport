@@ -14,31 +14,30 @@ namespace AlertReport.Db.DAL
         public IAlertReportRepository<User> UserRepository { get; set; }
         public IAlertReportRepository<Role> RoleRepository { get; set; }
         public IAlertReportRepository<Alert> AlertRepository { get; set; }
+        public IAlertReportRepository<Comment> CommentRepository { get; set; }
+
+        private DbContext DbContext;
 
         public UnitOfWork(IAlertReportRepository<User> userRepository, IAlertReportRepository<Role> roleRepository,
-            IAlertReportRepository<Alert> alertRepository)
+            IAlertReportRepository<Alert> alertRepository, IAlertReportRepository<Comment> commentRepository)
         {
+            DbContext = new AlertReportContext();
             UserRepository = userRepository;
+            UserRepository.SetContextAndDbSet(DbContext);
             RoleRepository = roleRepository;
+            RoleRepository.SetContextAndDbSet(DbContext);
             AlertRepository = alertRepository;
+            AlertRepository.SetContextAndDbSet(DbContext);
+            CommentRepository = commentRepository;
+            CommentRepository.SetContextAndDbSet(DbContext);
         }
 
         public void Dispose()
         {
-            if (UserRepository != null)
+            if (DbContext != null)
             {
-                UserRepository.Dispose();
-                UserRepository = null;
-            }                
-            if (RoleRepository != null)
-            {
-                RoleRepository.Dispose();
-                RoleRepository = null;
-            }
-            if (AlertRepository != null)
-            {
-                AlertRepository.Dispose();
-                AlertRepository = null;
+                DbContext.Dispose();
+                DbContext = null;
             }
         }
     }
